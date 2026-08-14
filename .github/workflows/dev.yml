@@ -1,0 +1,61 @@
+name: "Terraform Azure Dev Pipeline"
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature*'      # Triggers on feature, feature-rg, feature/add-rg etc.
+      - 'feature/**'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  terraform:
+    name: "Terraform Workflow"
+    runs-on: ubuntu-latest
+    
+    env:
+      # Azure ke secrets jo aapne GitHub Settings me dale hain
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+    # Yeh line important hai kyuki aapka code environment/dev ke andar hai
+    defaults:
+      run:
+        working-directory: ./environment/dev
+
+    steps:
+      # Step 1: Code repository se checkout karna
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Step 2: Terraform install karna
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.0
+
+      # Step 3: Terraform Init (environment/dev ke andar chalega)
+      - name: Terraform Init
+        run: terraform init
+
+      # Step 4: Format check
+      - name: Terraform Format Check
+        run: terraform fmt -check
+
+      # Step 5: Terraform Plan (Yeh feature branch push aur PR dono pe chalega)
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color
+
+      # Step 6: Terraform Apply (Yeh SIRF tab chalega jab main branch me merge ya push hoga)
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve
