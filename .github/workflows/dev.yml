@@ -41,21 +41,27 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.8.0
+      
+      # Step 2: Azure Login (JSON Secrets ka use karke)
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Step 3: Terraform Init (environment/dev ke andar chalega)
-      - name: Terraform Init
-        run: terraform init
+      # Step 3: Terraform Init
+      -  name: Terraform Init
+         run: terraform init
 
-      # Step 4: Format check
-      - name: Terraform Format Check
-        run: terraform fmt -check
+    # Step 4: Format check
+      -  name: Terraform Format Check
+         run: terraform fmt -check
 
-      # Step 5: Terraform Plan (Yeh feature branch push aur PR dono pe chalega)
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan -no-color
+    # Step 5: Terraform Plan
+      -  name: Terraform Plan
+         id: plan
+         run: terraform plan -no-color
 
-      # Step 6: Terraform Apply (Yeh SIRF tab chalega jab main branch me merge ya push hoga)
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve
+    # Step 6: Terraform Apply (SIRF main branch merge/push par)
+      -  name: Terraform Apply
+         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+         run: terraform apply -auto-approve
