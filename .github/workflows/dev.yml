@@ -3,13 +3,10 @@ name: 'Dev Infrastructure Pipeline'
 on:
   push:
     branches-ignore:
-      - main       # Jab kisi bhi feature branch par code push ho
+      - main       # Main ke alawa kisi bhi feature branch par push hone par
   pull_request:
     branches:
-      - main       # Jab main branch ke liye PR open/update ho
-  push:
-    branches:
-      - main       # Jab PR main me merge ho jaye
+      - main       # Main branch ke PR par
 
 permissions:
   contents: write
@@ -24,7 +21,7 @@ jobs:
     name: 'Terraform Plan & Auto PR'
     if: github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
-
+    
     defaults:
       run:
         working-directory: ./Environment/Dev_environment
@@ -55,25 +52,23 @@ jobs:
     - name: Terraform Plan
       run: terraform plan -no-color -input=false
 
-    # Feature branch par push hone par automatic PR raise karna
-    - name: Create Pull Request Automatically
-      if: github.event_name == 'push'
+    # Automatic PR raise karne ke liye step    - name: Create Pull Request Automatically
       uses: peter-evans/create-pull-request@v6
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         branch: ${{ github.ref_name }}
         base: main
         title: "Automated PR: Terraform changes from ${{ github.ref_name }}"
-        body: "Yeh PR automatic action dwara banayi gayi hai. Pre-checks (Init, Format, Validate, Plan) successfully pass ho chuke hain."
+        body: "Yeh PR automatic action dwara banayi gayi hai. Pre-checks pass ho chuke hain."
 
   # -------------------------------------------------------------
   # JOB 2: Main Branch -> Manual Approval & Apply
   # -------------------------------------------------------------
   terraform-apply:
     name: 'Terraform Apply (Main Branch)'
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    environment: production   # Yeh line Manual Approval ke liye zaroori hai
+    environment: production   # Manual Approval ke liye (Settings -> Environments me bana hona chahiye)
 
     defaults:
       run:
