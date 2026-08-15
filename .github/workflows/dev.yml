@@ -1,67 +1,100 @@
-name: "Terraform Azure Dev Pipeline"
+name: 'Dev Infrastructure Pipeline'
 
 on:
   push:
-    branches:
-      - main
-      - 'feature*'      # Triggers on feature, feature-rg, feature/add-rg etc.
-      - 'feature/**'
+    branches-ignore:
+      - main       # Jab kisi bhi feature branch par code push ho
   pull_request:
     branches:
-      - main
+      - main       # Jab main branch ke liye PR open/update ho
+  push:
+    branches:
+      - main       # Jab PR main me merge ho jaye
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
+  id-token: write
 
 jobs:
-  terraform:
-    name: "Terraform Workflow"
+  # -------------------------------------------------------------
+  # JOB 1: Feature Branch -> Init, Fmt, Validate, Plan & Auto PR
+  # -------------------------------------------------------------
+  terraform-plan:
+    name: 'Terraform Plan & Auto PR'
+    if: github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
-    
-    env:
-      # Azure ke secrets jo aapne GitHub Settings me dale hain
-      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
 
-    # Yeh line important hai kyuki aapka code environment/dev ke andar hai
     defaults:
       run:
         working-directory: ./Environment/Dev_environment
 
     steps:
-      # Step 1: Code repository se checkout karna
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-      # Step 2: Terraform install karna
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.8.0
-      
-      # Step 2: Azure Login (JSON Secrets ka use karke)
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Step 3: Terraform Init
-      -  name: Terraform Init
-         run: terraform init
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.7.0
 
-    # Step 4: Format check
-      -  name: Terraform Format Check
-         run: terraform fmt -check
+    - name: Terraform Init
+      run: terraform init
 
-    # Step 5: Terraform Plan
-      -  name: Terraform Plan
-         id: plan
-         run: terraform plan -no-color
+    - name: Terraform Format Check
+      run: terraform fmt -check
 
-    # Step 6: Terraform Apply (SIRF main branch merge/push par)
-      -  name: Terraform Apply
-         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-         run: terraform apply -auto-approve
+    - name: Terraform Validate
+      run: terraform validate
+
+    - name: Terraform Plan
+      run: terraform plan -no-color -input=false
+
+    # Feature branch par push hone par automatic PR raise karna
+    - name: Create Pull Request Automatically
+      if: github.event_name == 'push'
+      uses: peter-evans/create-pull-request@v6
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref_name }}
+        base: main
+        title: "Automated PR: Terraform changes from ${{ github.ref_name }}"
+        body: "Yeh PR automatic action dwara banayi gayi hai. Pre-checks (Init, Format, Validate, Plan) successfully pass ho chuke hain."
+
+  # -------------------------------------------------------------
+  # JOB 2: Main Branch -> Manual Approval & Apply
+  # -------------------------------------------------------------
+  terraform-apply:
+    name: 'Terraform Apply (Main Branch)'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: production   # Yeh line Manual Approval ke liye zaroori hai
+
+    defaults:
+      run:
+        working-directory: ./Environment/Dev_environment
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.7.0
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve -input=false
