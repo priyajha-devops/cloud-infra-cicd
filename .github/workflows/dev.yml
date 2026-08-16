@@ -40,7 +40,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 5.0.0
+          terraform_version: 1.8.0
 
       # Step 3: Terraform Init (environment/dev ke andar chalega)
       - name: Terraform Init
