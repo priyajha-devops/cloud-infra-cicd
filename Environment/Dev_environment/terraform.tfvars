@@ -71,8 +71,8 @@ var_niccard = {
     name                          = "nic_westeurope"
     location                      = "westeurope"
     resource_group_name           = "resource_prod"
-    name_subnet                   = "internal"
-    subnet_id                     = "/subscriptions/5b03e105-f606-436a-ab99-e33ae06a3230/resourceGroups/resource_prod/providers/Microsoft.Network/virtualNetworks/vnetwesteurope/subnets/subneteasteurope"
+    name_subnet                   = "subneteasteurope"
+    vnet_name                     = "vnetwesteurope"
     private_ip_address_allocation = "Dynamic"
 
   }
@@ -80,8 +80,8 @@ var_niccard = {
     name                          = "nic_centralindia"
     location                      = "centralindia"
     resource_group_name           = "resource_dev"
-    name_subnet                   = "internal"
-    subnet_id                     = "/subscriptions/5b03e105-f606-436a-ab99-e33ae06a3230/resourceGroups/resource_dev/providers/Microsoft.Network/virtualNetworks/vnetcentralindia/subnets/subnetcentralindia"
+    name_subnet                   = "subnetcentralindia"
+    vnet_name                     = "vnetcentralindia"
     private_ip_address_allocation = "Dynamic"
 
   }
@@ -119,21 +119,21 @@ var_publicip = {
 
 var_virtualmachine = {
   vm1 = {
-    name                  = "westeurope-vm"
-    location              = "westeurope"
-    resource_group_name   = "resource_prod"
-    network_interface_ids = ["/subscriptions/5b03e105-f606-436a-ab99-e33ae06a3230/resourceGroups/resource_prod/providers/Microsoft.Network/networkInterfaces/nic_westeurope"]
-    vm_size               = "Standard_D2s_v3"
-    disk_nm               = "linux_disk"
+    name                = "westeurope-vm"
+    location            = "westeurope"
+    resource_group_name = "resource_prod"
+    name_nic            = "nic_westeurope"
+    vm_size             = "Standard_D2s_v3"
+    disk_nm             = "linux_disk"
 
   }
   vm2 = {
-    name                  = "centralindia-vm"
-    location              = "centralindia"
-    resource_group_name   = "resource_dev"
-    network_interface_ids = ["/subscriptions/5b03e105-f606-436a-ab99-e33ae06a3230/resourceGroups/resource_dev/providers/Microsoft.Network/networkInterfaces/nic_centralindia"]
-    vm_size               = "Standard_D2s_v3"
-    disk_nm               = "linux_disk"
+    name                = "centralindia-vm"
+    location            = "centralindia"
+    resource_group_name = "resource_dev"
+    name_nic            = "nic_centralindia"
+    vm_size             = "Standard_D2s_v3"
+    disk_nm             = "linux_disk"
 
   }
 }
