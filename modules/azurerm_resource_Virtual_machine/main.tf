@@ -3,7 +3,7 @@ resource "azurerm_virtual_machine" "main" {
   name                  = each.value.name
   location              = each.value.location
   resource_group_name   = each.value.resource_group_name
-  network_interface_ids = data.azurerm_network_interface.data_nic[each.key].id
+  network_interface_ids = [data.azurerm_network_interface.data_nic[each.key].id]
   vm_size               = each.value.vm_size
 
   storage_image_reference {
