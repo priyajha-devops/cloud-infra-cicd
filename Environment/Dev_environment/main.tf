@@ -13,6 +13,7 @@ module "subnet" {
   source     = "../../modules/azurerm_resource_subnet"
   subnet     = var.var_subnet
 }
+
 module "vnetpeering" {
   depends_on = [module.vnet]
   source     = "../../modules/azurerm_resource_vnet_peering"
@@ -25,6 +26,13 @@ module "nic" {
   var_nic    = var.var_niccard
 
 }
+data "azurerm_network_interface" "data_nic" {
+  for_each            = var.var_niccard
+  name                = each.value.name
+  resource_group_name = each.value.resource_group_name
+
+}
+
 module "nsg" {
   depends_on = [module.resource_group]
   source     = "../../modules/azurerm_resource_NSG"
