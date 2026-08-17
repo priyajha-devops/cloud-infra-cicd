@@ -29,7 +29,7 @@ jobs:
         working-directory: ./Environment/Dev_environment
 
     steps:
-      # Step 1: Code repository se checkout karna
+      # Step 1: Code repository se checkout karna hai
       - name: Checkout Code
         uses: actions/checkout@v4
 
