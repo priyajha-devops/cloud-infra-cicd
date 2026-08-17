@@ -52,11 +52,12 @@ jobs:
         run: terraform fmt -check
 
       # Step 5: Terraform Plan (Yeh feature branch push aur PR dono pe chalega)
+      # Step 5: Terraform Plan (With ENV Variables)
       - name: Terraform Plan
         id: plan
         env:
-         TF_LOG: DEBUG   # <--- Ye line add karein exact error dekhne ke liye
-         run: terraform plan -no-color
+          TF_LOG: DEBUG
+        run: terraform plan -no-color
        
       # Step 6: Terraform Apply (Yeh SIRF tab chalega jab main branch me merge ya push hoga)
       - name: Terraform Apply
