@@ -41,6 +41,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.8.0
+          terraform_wrapper: false
 
       # Step 3: Terraform Init (environment/dev ke andar chalega)
       - name: Terraform Init
@@ -53,7 +54,7 @@ jobs:
       # Step 5: Terraform Plan (Yeh feature branch push aur PR dono pe chalega)
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color
+        run: terraform plan -no-color -var-file="terraform.tfvars"
 
       # Step 6: Terraform Apply (Yeh SIRF tab chalega jab main branch me merge ya push hoga)
       - name: Terraform Apply
