@@ -133,6 +133,7 @@ var_virtualmachine = {
     resource_group_name   = "resource_dev"
     network_interface_ids = ["/subscriptions/5b03e105-f606-436a-ab99-e33ae06a3230/resourceGroups/resource_dev/providers/Microsoft.Network/networkInterfaces/nic_centralindia"]
     vm_size               = "Standard_D2s_v3"
+    disk_nm               = "linux_disk"
 
   }
 }
