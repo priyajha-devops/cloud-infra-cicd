@@ -3,11 +3,8 @@ name: "Terraform Azure Dev Pipeline"
 on:
   push:
     branches:
-      - main
-      - 'feature*'      # Triggers on feature, feature-rg, feature/add-rg etc.
+      - 'feature*'
       - 'feature/**'
-  pull_request:
-    branches:
       - main
 
 permissions:
@@ -55,8 +52,7 @@ jobs:
       # Step 5: Terraform Plan (With ENV Variables)
       - name: Terraform Plan
         id: plan
-        env:
-          TF_LOG: DEBUG
+        
         run: terraform plan -no-color
        
       # Step 6: Terraform Apply (Yeh SIRF tab chalega jab main branch me merge ya push hoga)
