@@ -53,13 +53,13 @@ jobs:
         id: plan
         run: terraform plan -no-color -detailed-exitcode=false
 
-      # Step 6: Terraform Apply (SIRF tab chalega jab main branch me merge hoga)
+     # Step 6: Terraform Apply (Sirf main branch par chalega)
       - name: Terraform Apply
+        id: apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve
 
-        
-      # Manual Trigger se Jab Destroy Select Karein
-      - name: Terraform Destroy
-        if: github.event.inputs.action == 'destroy'
+      # Step 7: Terraform Destroy (Agar Apply FAIL hota hai tabhi chalega)
+      - name: Terraform Auto-Destroy on Failure
+        if: failure() && steps.apply.outcome == 'failure' && github.ref == 'refs/heads/main'
         run: terraform destroy -auto-approve
