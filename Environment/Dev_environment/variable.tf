@@ -1,0 +1,9 @@
+variable "var_rg" {}
+variable "var_vnet" {}
+variable "var_subnet" {}
+variable "var_peering" {}
+variable "var_niccard" {}
+variable "var_nsgroup" {}
+variable "var_publicip" {}
+variable "var_virtualmachine" {}
+variable "var_bastion" {}
