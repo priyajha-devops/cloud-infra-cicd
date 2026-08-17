@@ -7,6 +7,10 @@ var_rg = {
     name     = "resource_dev"
     location = "centralindia"
   }
+  rg3 = {
+    name     = "resource_test"
+    location = "centralindia"
+  }
 }
 
 var_vnet = {
