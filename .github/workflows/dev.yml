@@ -54,8 +54,10 @@ jobs:
       # Step 5: Terraform Plan (Yeh feature branch push aur PR dono pe chalega)
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color -var-file="terraform.tfvars"
-
+        env:
+         TF_LOG: DEBUG   # <--- Ye line add karein exact error dekhne ke liye
+         run: terraform plan -no-color
+       
       # Step 6: Terraform Apply (Yeh SIRF tab chalega jab main branch me merge ya push hoga)
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
