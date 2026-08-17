@@ -7,7 +7,7 @@ resource "azurerm_network_interface" "example" {
 
   ip_configuration {
     name                          = each.value.name_subnet
-    subnet_id                     = [data.azurerm_subnet.subnetdata[each.key].id]
+    subnet_id                     = data.azurerm_subnet.subnetdata[each.key].id
     private_ip_address_allocation = each.value.private_ip_address_allocation
   }
 }
