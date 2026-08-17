@@ -3,7 +3,7 @@ name: "Terraform Azure Dev Pipeline"
 on:
   push:
     branches:
-      - 'feature*'
+      -  feature
       - 'feature/**'
       - main
 
